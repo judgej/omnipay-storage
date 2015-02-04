@@ -1,0 +1,37 @@
+{
+    "name": "omnipay/storage",
+    "type": "library",
+    "description": "Transaction storage interface for the Omnipay payment processing library",
+    "keywords": [
+        "transaction",
+        "storage",
+        "gateway",
+        "merchant",
+        "omnipay",
+        "pay",
+        "payment"
+    ],
+    "homepage": "https://github.com/academe/omnipay-storage",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jason Judge",
+            "email": "jason@academe.co.uk"
+        },
+        {
+            "name": "Omnipay Contributors",
+            "homepage": "https://github.com/thephpleague/omnipay-authorizenet/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Omnipay\\Storage\\" : "src/" }
+    },
+    "require-dev": {
+        "omnipay/tests": "~2.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
+    }
+}
