@@ -2,7 +2,9 @@
 
 namespace Omnipay\Storage;
 
-abstract class Transaction
+use Omnipay\Common\Message\AbstractResponse as AbstractResponse;
+
+class Transaction
 {
     protected $storage;
 
@@ -33,6 +35,7 @@ abstract class Transaction
      */
     public function getByTransactionId($transaction_id)
     {
+        return $this->storage->getByTransactionId($transaction_id);
     }
 
     /**
@@ -41,6 +44,84 @@ abstract class Transaction
      */
     public function getByTransactionReference($transaction_reference)
     {
+        return $this->storage->getByTransactionReference($transaction_reference);
+    }
+
+    /**
+     * Set the initial response; the response from the first send() to the OmniPay gateway.
+     */
+    public function setFirstResponse(AbstractResponse $response)
+    {
+       $this->setTransactionId($response->getRequest()->getTransactionId());
+       $this->setAmount($response->getRequest()->getAmount());
+       $this->setStatus($response->getCode());
+       $this->setMessage($response->getMessage());
+    }
+
+    /**
+     * Set the transactino amount.
+     * This is sometimes used for validation in the callback.
+     */
+    public function setAmount($amount)
+    {
+        $this->storage->setAmount($amount);
+        $this->dirty = true;
+    }
+
+    /**
+     * Get the transactino amount.
+     * This is sometimes used for validation in the callback.
+     */
+    public function getAmount()
+    {
+        return $this->storage->getAmount($amount);
+    }
+
+    /**
+     * Set the transactino ID.
+     */
+    public function setTransactionId($transaction_id)
+    {
+        $this->storage->setTransactionId($transaction_id);
+        $this->dirty = true;
+    }
+
+    /**
+     * Set the transactino overall status code.
+     */
+    public function setStatus($status_code)
+    {
+        $this->storage->setStatus($status_code);
+        $this->dirty = true;
+    }
+
+    /**
+     * Set the transaction status reason message.
+     */
+    public function setMessage($status_reason)
+    {
+        $this->storage->setMessage($status_reason);
+        $this->dirty = true;
+    }
+
+    /**
+     * Set the callback status code.
+     * The storage driver may also force a knock-on effect on the overall status too.
+     */
+    public function setCallbackStatus($status_code)
+    {
+        $this->storage->setCallbackStatus($status_code);
+        $this->dirty = true;
+    }
+
+    /**
+     * Set the gateway context.
+     * This will identify a unique gateway instance by name.
+     */
+    public function setContext($context_name)
+    {
+        $this->storage->setContext($context_name);
+        $this->dirty = true;
     }
 
     /**
@@ -50,16 +131,21 @@ abstract class Transaction
     public function save()
     {
         if ($this->dirty) {
-            // ...
+            $this->storage->save();
+
+            $this->dirty = false;
         }
     }
 
-    /**
-     * Create a new transaction.
-     */
-    public function new()
-    {
-    }
+    // Get/set for always-supported fields.
+    // * transaction id (unique, merchant)
+    // * transaction reference
+    // * Overall status
+    // * Callback status
+    // * Status reason
+    // * Gateway context (a local name)
+    // * Request data (strip out CC details!)
+    // * Callback data
 
     /**
      * Magic function setter for all other fields.
@@ -74,12 +160,12 @@ abstract class Transaction
     /**
      * Magic function getter for all other fields.
      */
-    public function __get($property, $default == '')
+    public function __get($property)
     {
         if (isset($this->fields[$property])) {
             return $this->fields[$property];
         } else {
-            return $default;
+            return null;
         }
     }
 }
