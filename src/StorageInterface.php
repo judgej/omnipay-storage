@@ -25,6 +25,17 @@ interface StorageInterface
     public function setStatus($status_code);
 
     /**
+     * Set the transaction reference provided by the gateway.
+     */
+    public function setTransactionReference($reference);
+
+    /**
+     * Set all the callback data, for use when debugging and likely to use
+     * when returning the user to the merchant site.
+     */
+    public function setCallbackData($data);
+
+    /**
      * Set the transaction status reason message.
      */
     public function setMessage($status_reason);
